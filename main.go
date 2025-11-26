@@ -59,5 +59,19 @@ func main() {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
 	})
 
+	router.DELETE("/api/todos/:id", func(c *gin.Context) {
+		id := c.Param("id")
+
+		for i, todo := range todos {
+			if fmt.Sprint(todo.ID) == id {
+				todos = append(todos[:i], todos[i+1:]...)
+				c.JSON(http.StatusOK, gin.H{"success": "true"})
+				return
+			}
+		}
+
+		c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
+	})
+
 	router.Run()
 }
