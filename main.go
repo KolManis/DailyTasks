@@ -17,18 +17,9 @@ func main() {
 	todos := []Todo{}
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World!",
-		})
+	router.GET("/api/todos", func(c *gin.Context) {
+		c.JSON(http.StatusOK, todos)
 	})
-
-	fmt.Println("-------------------------------")
-	var x int = 5
-	var p *int = &x
-	fmt.Println(p)
-	fmt.Println(*p)
-	fmt.Println("-------------------------------")
 
 	router.POST("/api/todos", func(c *gin.Context) {
 		todo := &Todo{}
@@ -65,7 +56,7 @@ func main() {
 			}
 		}
 
-		c.JSON(http.StatusNotFound, gin.H{"error": "Todo mot found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
 	})
 
 	router.Run()
