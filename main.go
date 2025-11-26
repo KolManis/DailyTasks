@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 type Todo struct {
@@ -16,6 +19,16 @@ type Todo struct {
 func main() {
 	todos := []Todo{}
 	router := gin.Default()
+
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	port := os.Getenv("PORT")
+	// if port == "" {
+	// 	port = "8080" // порт по умолчанию если в .env нет PORT
+	// }
 
 	router.GET("/api/todos", func(c *gin.Context) {
 		c.JSON(http.StatusOK, todos)
@@ -73,5 +86,6 @@ func main() {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
 	})
 
-	router.Run()
+	log.Printf("Server starting on port %s", port)
+	router.Run(":" + port)
 }
