@@ -7,27 +7,66 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Todo struct {
+	ID        int    `json:"id"`
+	Completed bool   `json:"completed"`
+	Body      string `json:"body"`
+}
+
 func main() {
-	// router := gin.Default()
+	todos := []Todo{}
+	router := gin.Default()
 
-	// router.GET("/", func(c *gin.Context) {
-	// 	c.String(200, "Hello World")
-	// })
-
-	// router.Run(":3000")
-
-	// Create a Gin router with default middleware (logger and recovery)
-	r := gin.Default()
-	fmt.Println("ДДАДАДАДА")
-	// Define a simple GET endpoint
-	r.GET("/ping", func(c *gin.Context) {
-		// Return JSON response
+	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"message": "Hello World!",
 		})
 	})
 
-	// Start server on port 8080 (default)
-	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
-	r.Run()
+	fmt.Println("-------------------------------")
+	var x int = 5
+	var p *int = &x
+	fmt.Println(p)
+	fmt.Println(*p)
+	fmt.Println("-------------------------------")
+
+	router.POST("/api/todos", func(c *gin.Context) {
+		todo := &Todo{}
+
+		if err := c.BindJSON(todo); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+			return
+		}
+
+		if todo.Body == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Todo body is required"})
+			return
+		}
+
+		if len(todos) > 0 {
+			todo.ID = todos[len(todos)-1].ID + 1
+		} else {
+			todo.ID = 1
+		}
+
+		todos = append(todos, *todo)
+
+		c.JSON(http.StatusCreated, todo)
+	})
+
+	router.PATCH("/api/todos/:id", func(c *gin.Context) {
+		id := c.Param("id")
+
+		for i, todo := range todos {
+			if fmt.Sprint(todo.ID) == id {
+				todos[i].Completed = true
+				c.JSON(http.StatusOK, todos[i])
+				return
+			}
+		}
+
+		c.JSON(http.StatusNotFound, gin.H{"error": "Todo mot found"})
+	})
+
+	router.Run()
 }
