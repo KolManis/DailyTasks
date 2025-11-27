@@ -158,13 +158,18 @@ func main() {
 			return
 		}
 
-		if len(todos) > 0 {
-			todo.ID = todos[len(todos)-1].ID + 1
-		} else {
-			todo.ID = 1
+		err := db.QueryRow(
+			"INSERT INTO todos (body, completed) VALUES ($1, $2) RETURNING id",
+			todo.Body, false,
+		).Scan(&todo.ID)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create todo"})
+			return
 		}
 
-		todos = append(todos, *todo)
+		// Устанавливаем completed в false явно
+		todo.Completed = false
 
 		c.JSON(http.StatusCreated, todo)
 	})
