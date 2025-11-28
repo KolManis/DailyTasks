@@ -1,0 +1,12 @@
+
+docker-compose up -d
+
+
+docker-compose down
+
+
+docker-compose logs api
+docker-compose logs postgres
+
+
+docker-compose down -v

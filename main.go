@@ -160,7 +160,7 @@ func main() {
 			return
 		}
 
-		c.JSON(http.StatusNotFound, updatedTodo)
+		c.JSON(http.StatusOK, updatedTodo)
 	})
 
 	router.DELETE("/api/todos/:id", func(c *gin.Context) {
