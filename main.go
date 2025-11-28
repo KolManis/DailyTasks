@@ -109,7 +109,6 @@ func main() {
 	initDB() // ← подключение к PostgreSQL
 	defer db.Close()
 
-	todos := []Todo{}
 	router := gin.Default()
 
 	err := godotenv.Load(".env")
@@ -205,7 +204,10 @@ func main() {
 		}
 
 		result, err := db.Exec("DELETE FROM todos WHERE id = $1", id)
-
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
+		}
 		rowsAffected, _ := result.RowsAffected()
 		if rowsAffected == 0 {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
