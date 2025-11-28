@@ -168,7 +168,6 @@ func main() {
 			return
 		}
 
-		// Устанавливаем completed в false явно
 		todo.Completed = false
 
 		c.JSON(http.StatusCreated, todo)
@@ -177,15 +176,23 @@ func main() {
 	router.PATCH("/api/todos/:id", func(c *gin.Context) {
 		id := c.Param("id")
 
-		for i, todo := range todos {
-			if fmt.Sprint(todo.ID) == id {
-				todos[i].Completed = true
-				c.JSON(http.StatusOK, todos[i])
-				return
-			}
+		_, err = db.Exec("UPDATE todos SET completed =  NOT completed WHERE id = $1", id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update todo"})
+			return
 		}
 
-		c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
+		var updatedTodo Todo
+		err := db.QueryRow(
+			"SELECT id, body, completed FROM todos WHERE id = $1",
+			id).Scan(&updatedTodo.ID, &updatedTodo.Body, &updatedTodo.Completed)
+
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})
+			return
+		}
+
+		c.JSON(http.StatusNotFound, updatedTodo)
 	})
 
 	router.DELETE("/api/todos/:id", func(c *gin.Context) {
