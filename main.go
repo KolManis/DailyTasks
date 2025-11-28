@@ -21,38 +21,6 @@ type Todo struct {
 
 var db *sql.DB
 
-// func initDB() {
-// 	var err error
-
-// 	// Вариант 1 - URL формат
-// 	connStr := "postgres://postgres:postgres@localhost:5433/dailytasks?sslmode=disable"
-
-// 	// Вариант 2 - с явным указанием client_encoding
-// 	// connStr := "user=postgres password=password123 dbname=dailytasks host=localhost port=5432 sslmode=disable client_encoding=UTF8"
-
-// 	fmt.Println("Trying to connect with:", connStr)
-
-// 	db, err = sql.Open("postgres", connStr)
-// 	if err != nil {
-// 		log.Fatal("Database connection failed:", err)
-// 	}
-
-// 	// Установи таймауты
-// 	db.SetConnMaxLifetime(time.Minute * 3)
-// 	db.SetMaxOpenConns(10)
-// 	db.SetMaxIdleConns(10)
-// 	db.SetConnMaxIdleTime(time.Minute * 1)
-
-// 	// Дадим время на подключение
-// 	time.Sleep(2 * time.Second)
-
-// 	err = db.Ping()
-// 	if err != nil {
-// 		log.Fatal("Database ping failed:", err)
-// 	}
-
-//		fmt.Println("✅ Connected to PostgreSQL!")
-//	}
 func initDB() {
 	var err error
 
@@ -78,7 +46,7 @@ func initDB() {
 		dbName,
 	)
 
-	fmt.Println("🔗 Connecting to PostgreSQL...")
+	fmt.Println("Connecting to PostgreSQL...")
 
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
@@ -208,6 +176,7 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 			return
 		}
+
 		rowsAffected, _ := result.RowsAffected()
 		if rowsAffected == 0 {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Todo not found"})

@@ -1,4 +1,4 @@
-# docker-compose.yml
+version: '3.8'
 services:
   postgres:
     image: postgres:15
@@ -7,10 +7,27 @@ services:
       POSTGRES_DB: dailytasks
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
     ports:
-      - "5433:5432"  # ← ВНЕШНИЙ порт 5433, ВНУТРЕННИЙ 5432
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: dailytasks_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres  
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=dailytasks
+      - PORT=8000
+    depends_on:
+      - postgres
     restart: unless-stopped
 
 volumes:
