@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -121,8 +122,14 @@ func main() {
 			return
 		}
 
+		todo.Body = strings.TrimSpace(todo.Body)
 		if todo.Body == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Todo body is required"})
+			return
+		}
+
+		if len(todo.Body) > 1000 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Todo body too long (max 1000 characters)"})
 			return
 		}
 
